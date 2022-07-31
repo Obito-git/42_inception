@@ -1,0 +1,79 @@
+# Docker-compose guide
+# https://www.baeldung.com/ops/docker-compose
+#
+# Basic version with dockerhub images
+# https://medium.com/swlh/wordpress-deployment-with-nginx-php-fpm-and-mariadb-using-docker-compose-55f59e5c1a
+#
+# Wordpress and mariadb simple installation
+# https://aymeric-cucherousset.fr/installer-wordpress-sur-debian-11/
+#
+# Wordpress Installation de WordPress avec Nginx, PHP-FPM, MariaDB et SSL/TLS
+# https://howto.wared.fr/installation-wordpress-ubuntu-nginx/
+#
+# php-fpm configuration
+# https://www.php.net/manual/en/install.fpm.configuration.php
+#
+# Docker-compose restart var
+# https://docs.docker.com/config/containers/start-containers-automatically/
+
+version: "3.9"
+services:
+  nginx:
+    container_name: nginx
+    build: requirements/nginx
+    image: nginx
+    env_file: .env
+    depends_on:
+      - mariadb
+    networks:
+      - inception_net
+    volumes:
+      - www:/var/www/html
+    ports:
+      - "443:443"
+    restart: unless-stopped
+
+  mariadb:
+    container_name: mariadb
+    build: requirements/mariadb
+    image: mariadb
+    env_file: .env
+    networks:
+      - inception_net
+    volumes:
+      - database:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
+
+  wordpress:
+    container_name: wordpress
+    build: requirements/wordpress
+    image: wordpress
+    env_file: .env
+    depends_on:
+      - mariadb
+    networks:
+      - inception_net
+    volumes:
+      - www:/var/www/html
+    restart: unless-stopped
+
+volumes:
+  www:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/amyroshn/data/www
+      o: bind
+  database:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/amyroshn/data/database
+      o: bind
+
+networks:
+  inception_net:
+    name: inception_net
+    driver: bridge
