@@ -57,6 +57,8 @@ services:
       - inception_net
     volumes:
       - www:/var/www/html
+    ports:
+      - "9000:9000"
     restart: unless-stopped
 
 volumes:

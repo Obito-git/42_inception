@@ -7,6 +7,8 @@ LOGIN=amyroshn
 all: up
 
 init: folders
+	git config --global user.email "$(LOGIN)@42.fr"
+	git config --global user.name "$(LOGIN)"
 	@if [ ! -d "/usr/local/bin/docker-compose" ] || \
 	@if [ ! -d "/usr/bin/docker" ]; then \
 		echo "$(YELLOW)"; \
