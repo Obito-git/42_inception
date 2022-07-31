@@ -7,8 +7,8 @@ LOGIN=amyroshn
 all: up
 
 init: folders
-	@$(shell git config --global user.email "$(LOGIN)@42.fr")
-	@$(shell git config --global user.name "$(LOGIN)")
+	@git config --global user.email "$(LOGIN)@42.fr"
+	@git config --global user.name "$(LOGIN)"
 	@if [ ! -d "/usr/local/bin/docker-compose" ] || \
 	@if [ ! -d "/usr/bin/docker" ]; then \
 		echo "$(YELLOW)"; \
@@ -55,16 +55,17 @@ list_volumes:
 	@echo "$(YELLOW)Listing volumes$(RESET)"
 	docker volume ls
 
-fclean:	down
-	@echo "$(YELLOW)Cleaning images, volumes and cache$(RESET)"
-	docker rmi -f $$(docker images -qa)
-	docker volume rm $$(docker volume ls -q)
-	docker system prune -a --force
+clean:
 	sudo rm -rf /home/${USER}/data/database
 	sudo rm -rf /home/${USER}/data/www
+	docker volume rm $$(docker volume ls -q)
 
-re:
-	docker-compose -f srcs/docker-compose.yml build
-	docker-compose -f ./srcs/docker-compose.yml up -d --build
+fclean:	down clean
+	@echo "$(YELLOW)Cleaning images, volumes and cache$(RESET)"
+	docker rmi -f $$(docker images -qa)
+	docker system prune -a --force
+
+re: clean up
+
 
 .PHONY: all init up down list list_volumes fclean re folders
